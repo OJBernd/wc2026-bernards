@@ -284,7 +284,7 @@ function renderRound(key) {
 
     html += '<div class="pred-grid">';
     for (var p = 0; p < 4; p++) {
-      html += '<div class="col-hdr" style="color:var(--' + PCOLORS[p] + ')">' + AVATARS[p] + ' ' + PLAYERS[p] + '<span class="pred-pending" id="' + m.id + '_ind' + p + '"></span></div>';
+      html += '<div class="col-hdr" style="color:var(--' + PCOLORS[p] + ')">' + AVATARS[p] + ' ' + PLAYERS[p] + (p !== currentPlayer ? '<span class="pred-pending" id="' + m.id + '_ind' + p + '"></span>' : '') + '</div>';
     }
     html += '<div class="col-hdr" style="color:var(--success)">\u26bd Result</div>';
 
