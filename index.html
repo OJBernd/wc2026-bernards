@@ -98,6 +98,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .pts-1 { background: rgba(251,191,36,0.15); color: #fbbf24; }
 .pts-2 { background: rgba(16,185,129,0.15); color: #34d399; }
 .pts-3 { background: rgba(16,185,129,0.3); color: #10b981; }
+.pts-3::after { content: ' 🎯'; }
+.match-card.has-result .score-cell.correct { background: rgba(16,185,129,0.1); border-radius: 6px; }
+.match-card.has-result .score-cell.perfect { background: rgba(16,185,129,0.2); border-radius: 6px; box-shadow: 0 0 6px rgba(16,185,129,0.3); }
 
 /* Other players' scores shown but not editable */
 .pred-grid .other-score { font-family: var(--mono); font-size: 12px; color: var(--text-sec); text-align: center; }
@@ -257,7 +260,7 @@ var roundKeys = ['r32','r16','qf','sf','final'];
 
 // Is a match locked? (1 hour before kickoff)
 function isLocked(m) {
-  var lockTime = new Date(new Date(m.kickoff).getTime() - 60*60*1000);
+  var lockTime = new Date(new Date(m.kickoff).getTime() - 7200000);
   return new Date() >= lockTime;
 }
 
@@ -277,29 +280,27 @@ function renderRound(key) {
     if (locked) html += ' <span class="lock-badge"><i class="fa-solid fa-lock"></i> LOCKED</span>';
     html += '</div></div>';
 
-    // Grid: 4 players + actual
     html += '<div class="pred-grid">';
-    // Headers
     for (var p = 0; p < 4; p++) {
       html += '<div class="col-hdr" style="color:var(--' + PCOLORS[p] + ')">' + AVATARS[p] + ' ' + PLAYERS[p] + '</div>';
     }
-    html += '<div class="col-hdr" style="color:var(--success)">⚽ Result</div>';
+    html += '<div class="col-hdr" style="color:var(--success)">\u26bd Result</div>';
 
-    // Input row
     for (var p = 0; p < 4; p++) {
       if (p === currentPlayer) {
-        // Current player gets editable inputs (unless locked)
+        // Current player: always sees own predictions, editable until lock
         html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"></div>';
+      } else if (locked) {
+        // Other players after lock: visible but disabled (everyone can see)
+        html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h" disabled><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a" disabled></div>';
       } else {
-        // Other players: show score if match is locked (or result exists), otherwise hidden
-        html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h" disabled style="opacity:0.4"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a" disabled style="opacity:0.4"></div>';
+        // Other players before lock: hidden (show placeholder)
+        html += '<div class="score-cell" style="opacity:0.3"><span style="font-size:11px;color:var(--text-muted)">\ud83d\udd12</span></div>';
       }
     }
-    // Actual result (only Daddy can edit — player 0)
     var canEditActual = (currentPlayer === 0);
     html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_ah" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_aa" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"></div>';
 
-    // Points row
     for (var p = 0; p < 4; p++) {
       html += '<div style="text-align:center"><span class="pts-badge" id="' + m.id + '_pts' + p + '">-</span></div>';
     }
@@ -374,18 +375,33 @@ function calculate() {
       var row = document.getElementById('row-' + m.id);
       if (ah !== null && aa !== null) row.classList.add('has-result');
       else row.classList.remove('has-result');
+      var locked = isLocked(m);
       for (var p = 0; p < 4; p++) {
-        var pts = calcPoints(getVal(m.id + '_p' + p + 'h'), getVal(m.id + '_p' + p + 'a'), ah, aa);
+        var ph = getVal(m.id + '_p' + p + 'h');
+        var pa = getVal(m.id + '_p' + p + 'a');
+        // Default to 0-0 if locked and no prediction was made
+        if (locked && ph === null) ph = 0;
+        if (locked && pa === null) pa = 0;
+        var pts = calcPoints(ph, pa, ah, aa);
         var badge = document.getElementById(m.id + '_pts' + p);
-        if (pts !== null) { badge.textContent = pts; badge.className = 'pts-badge pts-' + pts; totals[p] += pts; if (pts >= 1) wins[p]++; if (pts >= 2) diffs[p]++; if (pts === 3) exacts[p]++; }
-        else { badge.textContent = '-'; badge.className = 'pts-badge'; }
+        if (pts !== null) {
+          badge.textContent = pts;
+          badge.className = 'pts-badge pts-' + pts;
+          totals[p] += pts;
+          if (pts >= 1) wins[p]++;
+          if (pts >= 2) diffs[p]++;
+          if (pts === 3) exacts[p]++;
+        } else {
+          badge.textContent = '-';
+          badge.className = 'pts-badge';
+        }
       }
     }
   }
   var maxPts = Math.max.apply(null, totals);
   for (var p = 0; p < 4; p++) {
     document.getElementById('pts-' + p).textContent = totals[p];
-    document.getElementById('det-' + p).textContent = '🎯' + wins[p] + ' · ±' + diffs[p] + ' · ✓' + exacts[p];
+    document.getElementById('det-' + p).textContent = '\ud83c\udfaf' + wins[p] + ' \u00b7 \u00b1' + diffs[p] + ' \u00b7 \u2713' + exacts[p];
     var card = document.getElementById('sc-' + p);
     if (played > 0 && totals[p] === maxPts) card.classList.add('leader'); else card.classList.remove('leader');
   }
