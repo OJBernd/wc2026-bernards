@@ -404,19 +404,21 @@ function onPredChange(matchId) {
 
 function savePredToSheet(matchId, player, homeScore, awayScore) {
   if (API_URL === 'YOUR_APPS_SCRIPT_URL') { showToast('⚠️ Set API_URL first (see SETUP.md)', 'error'); return; }
-  var data = { action: 'save_prediction', match_id: matchId, player: player, home_score: homeScore, away_score: awayScore };
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', API_URL, true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.onload = function() {
-    try {
-      var resp = JSON.parse(xhr.responseText);
-      if (resp.error === 'LOCKED') { showToast('🔒 Match locked!', 'error'); }
-      else if (resp.success) { showToast('✅ Saved', 'success'); }
-    } catch(e) {}
-  };
-  xhr.onerror = function() { showToast('⚠️ Save failed — offline?', 'error'); };
-  xhr.send(JSON.stringify(data));
+  var url = API_URL + '?action=save_prediction&match_id=' + encodeURIComponent(matchId) +
+    '&player=' + encodeURIComponent(player) +
+    '&home_score=' + encodeURIComponent(homeScore) +
+    '&away_score=' + encodeURIComponent(awayScore);
+  fetch(url, { redirect: 'follow' })
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      try {
+        var resp = JSON.parse(text);
+        if (resp.error === 'LOCKED') { showToast('🔒 Match locked!', 'error'); }
+        else if (resp.success) { showToast('✅ Saved', 'success'); }
+        else if (resp.error) { showToast('⚠️ ' + resp.error, 'error'); }
+      } catch(e) { showToast('⚠️ Unexpected response', 'error'); }
+    })
+    .catch(function(e) { showToast('⚠️ Save failed: ' + e.message, 'error'); });
 }
 
 function syncFromSheet() {
@@ -428,13 +430,11 @@ function syncFromSheet() {
     return;
   }
   document.getElementById('fetch-status').textContent = '⏳ Syncing...';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', API_URL + '?action=read', true);
-  xhr.timeout = 10000;
-  xhr.onload = function() {
-    if (xhr.status === 200) {
+  fetch(API_URL + '?action=read', { redirect: 'follow' })
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
       try {
-        var resp = JSON.parse(xhr.responseText);
+        var resp = JSON.parse(text);
         if (resp.success && resp.matches) {
           applySheetData(resp.matches);
           document.getElementById('sync-dot').classList.remove('offline');
@@ -442,14 +442,12 @@ function syncFromSheet() {
           calculate();
         }
       } catch(e) { document.getElementById('fetch-status').textContent = '⚠️ Parse error'; }
-    }
-  };
-  xhr.onerror = function() {
-    document.getElementById('sync-dot').classList.add('offline');
-    document.getElementById('fetch-status').textContent = '⚠️ Offline — using local data';
-    loadLocal();
-  };
-  xhr.send();
+    })
+    .catch(function(e) {
+      document.getElementById('sync-dot').classList.add('offline');
+      document.getElementById('fetch-status').textContent = '⚠️ Offline — using local data';
+      loadLocal();
+    });
 }
 
 function applySheetData(rows) {
