@@ -259,6 +259,7 @@ var allMatches = {
   ]
 };
 var roundKeys = ['r32','r16','qf','sf','final'];
+var sheetData = {}; // stores {match_id: {daddy_h: x, daddy_a: y, ...}}
 
 // Is a match locked? (1 hour before kickoff)
 function isLocked(m) {
@@ -367,21 +368,29 @@ function calcPoints(ph, pa, ah, aa) {
 
 
 function updateIndicators() {
+  var playerKeys = ['daddy', 'antoine', 'gena', 'mommy'];
   for (var r = 0; r < roundKeys.length; r++) {
     var ms = allMatches[roundKeys[r]];
     for (var i = 0; i < ms.length; i++) {
       var m = ms[i];
       for (var p = 0; p < 4; p++) {
+        if (p === currentPlayer) continue; // no indicator for yourself
         var ind = document.getElementById(m.id + '_ind' + p);
         if (!ind) continue;
-        var h = getVal(m.id + '_p' + p + 'h');
-        var a = getVal(m.id + '_p' + p + 'a');
-        if (h !== null && a !== null) {
+        // Check from sheetData (synced from Google Sheets)
+        var row = sheetData[m.id];
+        var hasPred = false;
+        if (row) {
+          var hVal = row[playerKeys[p] + '_h'];
+          var aVal = row[playerKeys[p] + '_a'];
+          hasPred = (hVal !== '' && hVal !== undefined && hVal !== null) && (aVal !== '' && aVal !== undefined && aVal !== null);
+        }
+        if (hasPred) {
           ind.className = 'pred-done';
-          ind.title = PLAYERS[p] + ' has predicted';
+          ind.title = PLAYERS[p] + ' has predicted \u2705';
         } else {
           ind.className = 'pred-pending';
-          ind.title = PLAYERS[p] + ' has not predicted yet';
+          ind.title = PLAYERS[p] + ' has NOT predicted yet';
         }
       }
     }
@@ -493,6 +502,7 @@ function syncFromSheet() {
 }
 
 function applySheetData(rows) {
+  for (var k = 0; k < rows.length; k++) { if (rows[k].match_id) sheetData[rows[k].match_id] = rows[k]; }
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var id = row.match_id;
