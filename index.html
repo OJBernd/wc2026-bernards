@@ -102,6 +102,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .match-card.has-result .score-cell.correct { background: rgba(16,185,129,0.1); border-radius: 6px; }
 .match-card.has-result .score-cell.perfect { background: rgba(16,185,129,0.2); border-radius: 6px; box-shadow: 0 0 6px rgba(16,185,129,0.3); }
 
+.hidden-input { color: transparent !important; background: var(--surface-hover) !important; width: 32px; }
+.hidden-input::-webkit-inner-spin-button { display: none; }
+.other-hidden .dash { opacity: 0.3; }
 .pred-done { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); margin-left: 4px; vertical-align: middle; }
 .pred-pending { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; margin-left: 4px; vertical-align: middle; }
 /* Other players' scores shown but not editable */
@@ -294,11 +297,11 @@ function renderRound(key) {
         // Current player: always sees own predictions, editable until lock
         html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"></div>';
       } else if (locked) {
-        // Other players after lock: visible but disabled (everyone can see)
+        // Other players after lock: visible, disabled
         html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h" disabled><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a" disabled></div>';
       } else {
-        // Other players before lock: hidden (show placeholder)
-        html += '<div class="score-cell" style="opacity:0.3"><span style="font-size:11px;color:var(--text-muted)">\ud83d\udd12</span></div>';
+        // Other players before lock: inputs exist (for sync) but values hidden
+        html += '<div class="score-cell other-hidden"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h" disabled class="hidden-input"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a" disabled class="hidden-input"></div>';
       }
     }
     var canEditActual = (currentPlayer === 0);
@@ -432,12 +435,34 @@ function calculate() {
       }
     }
   }
-  var maxPts = Math.max.apply(null, totals);
+  // Rank players by total points
+  var ranked = [0,1,2,3].sort(function(a,b) { return totals[b] - totals[a]; });
+  var trophies = ['🥇','🥈','🥉',''];
+  var trophyLabels = ['🏆','🥈','🥉',''];
   for (var p = 0; p < 4; p++) {
     document.getElementById('pts-' + p).textContent = totals[p];
     document.getElementById('det-' + p).textContent = '\ud83c\udfaf' + wins[p] + ' \u00b7 \u00b1' + diffs[p] + ' \u00b7 \u2713' + exacts[p];
     var card = document.getElementById('sc-' + p);
-    if (played > 0 && totals[p] === maxPts) card.classList.add('leader'); else card.classList.remove('leader');
+    card.classList.remove('leader');
+    // Remove any old rank badge
+    var oldBadge = card.querySelector('.rank-badge');
+    if (oldBadge) oldBadge.remove();
+  }
+  if (played > 0) {
+    for (var r = 0; r < 4; r++) {
+      var pi = ranked[r];
+      var card = document.getElementById('sc-' + pi);
+      if (r === 0) card.classList.add('leader');
+      // Add rank badge
+      var badge = document.createElement('div');
+      badge.className = 'rank-badge';
+      badge.style.cssText = 'position:absolute;top:6px;left:8px;font-size:16px;';
+      if (r === 0) badge.textContent = '\ud83c\udfc6'; // trophy
+      else if (r === 1) badge.textContent = '\ud83e\udd48'; // silver
+      else if (r === 2) badge.textContent = '\ud83e\udd49'; // bronze
+      else badge.textContent = '';
+      card.appendChild(badge);
+    }
   }
   document.getElementById('matches-info').textContent = played + '/' + total + ' played';
   updateIndicators();
@@ -562,7 +587,7 @@ function exportCSV() {
 }
 
 // Auto-refresh lock status every minute
-setInterval(function() { renderAll(); calculate(); }, 60000);
+setInterval(function() { syncFromSheet(); }, 120000); // Auto-sync every 2 minutes
 </script>
 </body>
 </html>
