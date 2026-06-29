@@ -11,6 +11,7 @@
   --text: #e8edf3; --text-sec: #94a3b8; --text-muted: #64748b;
   --accent: #f59e0b; --accent2: #10b981;
   --p1: #3b82f6; --p2: #ef4444; --p3: #a855f7; --p4: #f97316;
+  --p5: #06b6d4;
   --success: #10b981; --gold: #fbbf24; --danger: #ef4444;
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -31,6 +32,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .player-btn.pb2 { border-color: var(--p2); } .player-btn.pb2:hover { background: rgba(239,68,68,0.15); }
 .player-btn.pb3 { border-color: var(--p3); } .player-btn.pb3:hover { background: rgba(168,85,247,0.15); }
 .player-btn.pb4 { border-color: var(--p4); } .player-btn.pb4:hover { background: rgba(249,115,22,0.15); }
+.player-btn.pb5 { border-color: var(--p5); } .player-btn.pb5:hover { background: rgba(6,182,212,0.15); }
 
 /* Top bar */
 .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 100; }
@@ -51,11 +53,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .container { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
 
 /* Scoreboard */
-.scoreboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.scoreboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
 .score-card { background: var(--surface); border-radius: var(--radius); padding: 14px; text-align: center; border: 2px solid var(--border); position: relative; overflow: hidden; }
 .score-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
 .score-card.c1::before { background: var(--p1); } .score-card.c2::before { background: var(--p2); }
 .score-card.c3::before { background: var(--p3); } .score-card.c4::before { background: var(--p4); }
+.score-card.c5::before { background: var(--p5); }
+.score-card.c5 .pts { color: var(--p5); }
 .score-card .avatar { font-size: 22px; }
 .score-card .name { font-size: 12px; font-weight: 600; color: var(--text-sec); margin-top: 2px; }
 .score-card .pts { font-size: 34px; font-weight: 800; font-family: var(--mono); margin: 2px 0; }
@@ -83,7 +87,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .match-header .lock-badge { background: rgba(239,68,68,0.15); color: #f87171; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; }
 
 /* Predictions grid */
-.pred-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.pred-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .pred-grid .col-hdr { font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); text-align: center; font-weight: 600; padding-bottom: 4px; }
 .pred-grid .score-cell { display: flex; align-items: center; justify-content: center; gap: 2px; }
 .pred-grid input[type="number"] {
@@ -128,7 +132,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 
 @media (max-width: 768px) {
   .scoreboard { grid-template-columns: repeat(2, 1fr); }
-  .pred-grid { grid-template-columns: repeat(5, 1fr); gap: 3px; }
+  .pred-grid { grid-template-columns: repeat(6, 1fr); gap: 3px; }
   .pred-grid input[type="number"] { width: 26px; padding: 4px 1px; font-size: 11px; }
 }
 </style>
@@ -144,6 +148,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <button class="player-btn pb2" onclick="selectPlayer(1)">👦 Antoine</button>
     <button class="player-btn pb3" onclick="selectPlayer(2)">👧 Gena</button>
     <button class="player-btn pb4" onclick="selectPlayer(3)">👩 Mommy</button>
+    <button class="player-btn pb5" onclick="selectPlayer(4)">👶 Sophia</button>
   </div>
 </div>
 
@@ -173,6 +178,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="score-card c2" id="sc-1"><div class="avatar">👦</div><div class="name">Antoine</div><div class="pts" id="pts-1">0</div><div class="detail" id="det-1">🎯0 · ±0 · ✓0</div></div>
     <div class="score-card c3" id="sc-2"><div class="avatar">👧</div><div class="name">Gena</div><div class="pts" id="pts-2">0</div><div class="detail" id="det-2">🎯0 · ±0 · ✓0</div></div>
     <div class="score-card c4" id="sc-3"><div class="avatar">👩</div><div class="name">Mommy</div><div class="pts" id="pts-3">0</div><div class="detail" id="det-3">🎯0 · ±0 · ✓0</div></div>
+    <div class="score-card c5" id="sc-4"><div class="avatar">👶</div><div class="name">Sophia</div><div class="pts" id="pts-4">0</div><div class="detail" id="det-4">🎯0 · ±0 · ✓0</div></div>
   </div>
 
   <div class="info-bar">
@@ -212,9 +218,9 @@ var FLAGS = {
   "Switzerland":"🇨🇭","Australia":"🇦🇺","Egypt":"🇪🇬","Argentina":"🇦🇷","Cape Verde":"🇨🇻",
   "Colombia":"🇨🇴","Ghana":"🇬🇭","Austria":"🇦🇹","Algeria":"🇩🇿","TBD":"❓"
 };
-var PLAYERS = ["Daddy","Antoine","Gena","Mommy"];
-var AVATARS = ["👨","👦","👧","👩"];
-var PCOLORS = ["p1","p2","p3","p4"];
+var PLAYERS = ["Daddy","Antoine","Gena","Mommy","Sophia"];
+var AVATARS = ["👨","👦","👧","👩","👶"];
+var PCOLORS = ["p1","p2","p3","p4","p5"];
 var currentPlayer = 0;
 
 // Match data with kickoff times (UTC)
@@ -287,12 +293,12 @@ function renderRound(key) {
     html += '</div></div>';
 
     html += '<div class="pred-grid">';
-    for (var p = 0; p < 4; p++) {
+    for (var p = 0; p < 5; p++) {
       html += '<div class="col-hdr" style="color:var(--' + PCOLORS[p] + ')">' + AVATARS[p] + ' ' + PLAYERS[p] + (p !== currentPlayer ? '<span class="pred-pending" id="' + m.id + '_ind' + p + '"></span>' : '') + '</div>';
     }
     html += '<div class="col-hdr" style="color:var(--success)">\u26bd Result</div>';
 
-    for (var p = 0; p < 4; p++) {
+    for (var p = 0; p < 5; p++) {
       if (p === currentPlayer) {
         // Current player: always sees own predictions, editable until lock
         html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"></div>';
@@ -307,7 +313,7 @@ function renderRound(key) {
     var canEditActual = (currentPlayer === 0);
     html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_ah" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_aa" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"></div>';
 
-    for (var p = 0; p < 4; p++) {
+    for (var p = 0; p < 5; p++) {
       html += '<div style="text-align:center"><span class="pts-badge" id="' + m.id + '_pts' + p + '">-</span></div>';
     }
     html += '<div></div>';
@@ -371,12 +377,12 @@ function calcPoints(ph, pa, ah, aa) {
 
 
 function updateIndicators() {
-  var playerKeys = ['daddy', 'antoine', 'gena', 'mommy'];
+  var playerKeys = ['daddy', 'antoine', 'gena', 'mommy', 'sophia'];
   for (var r = 0; r < roundKeys.length; r++) {
     var ms = allMatches[roundKeys[r]];
     for (var i = 0; i < ms.length; i++) {
       var m = ms[i];
-      for (var p = 0; p < 4; p++) {
+      for (var p = 0; p < 5; p++) {
         if (p === currentPlayer) continue; // no indicator for yourself
         var ind = document.getElementById(m.id + '_ind' + p);
         if (!ind) continue;
@@ -401,7 +407,7 @@ function updateIndicators() {
 }
 
 function calculate() {
-  var totals = [0,0,0,0], wins = [0,0,0,0], diffs = [0,0,0,0], exacts = [0,0,0,0];
+  var totals = [0,0,0,0,0], wins = [0,0,0,0,0], diffs = [0,0,0,0,0], exacts = [0,0,0,0,0];
   var played = 0, total = 0;
   for (var r = 0; r < roundKeys.length; r++) {
     var ms = allMatches[roundKeys[r]];
@@ -413,7 +419,7 @@ function calculate() {
       if (ah !== null && aa !== null) row.classList.add('has-result');
       else row.classList.remove('has-result');
       var locked = isLocked(m);
-      for (var p = 0; p < 4; p++) {
+      for (var p = 0; p < 5; p++) {
         var ph = getVal(m.id + '_p' + p + 'h');
         var pa = getVal(m.id + '_p' + p + 'a');
         // Default to 0-0 if locked and no prediction was made
@@ -436,10 +442,10 @@ function calculate() {
     }
   }
   // Rank players by total points
-  var ranked = [0,1,2,3].sort(function(a,b) { return totals[b] - totals[a]; });
+  var ranked = [0,1,2,3,4].sort(function(a,b) { return totals[b] - totals[a]; });
   var trophies = ['🥇','🥈','🥉',''];
   var trophyLabels = ['🏆','🥈','🥉',''];
-  for (var p = 0; p < 4; p++) {
+  for (var p = 0; p < 5; p++) {
     document.getElementById('pts-' + p).textContent = totals[p];
     document.getElementById('det-' + p).textContent = '\ud83c\udfaf' + wins[p] + ' \u00b7 \u00b1' + diffs[p] + ' \u00b7 \u2713' + exacts[p];
     var card = document.getElementById('sc-' + p);
@@ -532,7 +538,7 @@ function applySheetData(rows) {
     var row = rows[i];
     var id = row.match_id;
     if (!id) continue;
-    for (var p = 0; p < 4; p++) {
+    for (var p = 0; p < 5; p++) {
       var key = PLAYERS[p].toLowerCase();
       var hEl = document.getElementById(id + '_p' + p + 'h');
       var aEl = document.getElementById(id + '_p' + p + 'a');
@@ -567,18 +573,18 @@ function showToast(msg, type) {
 
 function exportCSV() {
   var csv = 'Round,Date,Home,Away';
-  for (var p = 0; p < 4; p++) csv += ',' + PLAYERS[p] + '_H,' + PLAYERS[p] + '_A';
+  for (var p = 0; p < 5; p++) csv += ',' + PLAYERS[p] + '_H,' + PLAYERS[p] + '_A';
   csv += ',Actual_H,Actual_A';
-  for (var p = 0; p < 4; p++) csv += ',' + PLAYERS[p] + '_Pts';
+  for (var p = 0; p < 5; p++) csv += ',' + PLAYERS[p] + '_Pts';
   csv += '\n';
   for (var r = 0; r < roundKeys.length; r++) {
     var ms = allMatches[roundKeys[r]];
     for (var i = 0; i < ms.length; i++) {
       var m = ms[i];
       var row = [roundKeys[r], m.date, m.home, m.away];
-      for (var p = 0; p < 4; p++) { row.push(getVal(m.id+'_p'+p+'h') || ''); row.push(getVal(m.id+'_p'+p+'a') || ''); }
+      for (var p = 0; p < 5; p++) { row.push(getVal(m.id+'_p'+p+'h') || ''); row.push(getVal(m.id+'_p'+p+'a') || ''); }
       row.push(getVal(m.id+'_ah') || ''); row.push(getVal(m.id+'_aa') || '');
-      for (var p = 0; p < 4; p++) { row.push(document.getElementById(m.id+'_pts'+p).textContent); }
+      for (var p = 0; p < 5; p++) { row.push(document.getElementById(m.id+'_pts'+p).textContent); }
       csv += row.join(',') + '\n';
     }
   }
