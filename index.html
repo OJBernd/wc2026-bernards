@@ -111,7 +111,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .other-hidden .dash { opacity: 0.3; }
 .winner-pick { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 9px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--text-sec); margin-left: 2px; }
 .winner-pick.active { background: var(--accent); color: #000; border-color: var(--accent); }
-.winner-pick-wrap { display: none; margin-top: 2px; text-align: center; }
+.winner-pick-wrap { display: none; margin-top: 4px; text-align: center; clear: both; }
 .winner-pick-wrap.show { display: block; }
 .pred-done { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); margin-left: 4px; vertical-align: middle; }
 .pred-pending { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; margin-left: 4px; vertical-align: middle; }
@@ -292,7 +292,7 @@ function renderRound(key) {
     html += '<div class="match-card' + (locked ? ' locked' : '') + '" id="row-' + m.id + '">';
     html += '<div class="match-header">';
     html += '<div class="matchup">' + flag(m.home) + ' ' + m.home + '<span class="vs">vs</span>' + flag(m.away) + ' ' + m.away + '</div>';
-    html += '<div class="meta">' + m.date;
+    html += '<div class="meta"><span id="' + m.id + '_winner_flag" style="font-size:14px;margin-right:4px;"></span>' + m.date;
     if (locked) html += ' <span class="lock-badge"><i class="fa-solid fa-lock"></i> LOCKED</span>';
     html += '</div></div>';
 
@@ -374,17 +374,17 @@ function calcPoints(ph, pa, ah, aa, predWinner, actualWinner) {
   if (ph === null || pa === null || ah === null || aa === null) return null;
   var pts = 0;
   // 1. Correct advancing team (1 pt)
-  // Determine who advances in prediction
   var predAdvances = '';
   if (ph > pa) predAdvances = 'h';
   else if (pa > ph) predAdvances = 'a';
-  else predAdvances = predWinner || 'h'; // if draw predicted, use their pick (default home)
+  else predAdvances = predWinner || 'h'; // if draw predicted, use their pick
   // Determine who actually advanced
   var actAdvances = '';
   if (ah > aa) actAdvances = 'h';
   else if (aa > ah) actAdvances = 'a';
-  else actAdvances = actualWinner || 'h'; // if draw, use actual_winner field
-  if (predAdvances === actAdvances) pts++;
+  else actAdvances = actualWinner; // from PK score (could be null if not entered)
+  // Only award advancing team point if we know who advanced
+  if (actAdvances && predAdvances === actAdvances) pts++;
   // 2. Correct goal differential (1 pt)
   if ((ph - pa) === (ah - aa)) pts++;
   // 3. Exact score (1 pt)
@@ -438,7 +438,7 @@ function getActualWinner(matchId) {
     if (pkh > pka) return 'h';
     if (pka > pkh) return 'a';
   }
-  return 'h'; // default home if no PK score entered
+  return null; // no PK data = can't determine advancing team
 }
 
 
@@ -474,6 +474,15 @@ function calculate() {
       var row = document.getElementById('row-' + m.id);
       if (ah !== null && aa !== null) row.classList.add('has-result');
       else row.classList.remove('has-result');
+      // Show winning team flag next to date
+      var winnerFlagEl = document.getElementById(m.id + '_winner_flag');
+      if (winnerFlagEl && ah !== null && aa !== null) {
+        var advTeam = '';
+        if (ah > aa) advTeam = m.home;
+        else if (aa > ah) advTeam = m.away;
+        else { var aw = getActualWinner(m.id); advTeam = (aw === 'h') ? m.home : (aw === 'a') ? m.away : ''; }
+        winnerFlagEl.textContent = advTeam ? (FLAGS[advTeam] || '') + ' \u2705' : '';
+      }
       var locked = isLocked(m);
       for (var p = 0; p < 5; p++) {
         var ph = getVal(m.id + '_p' + p + 'h');
