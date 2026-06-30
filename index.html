@@ -103,6 +103,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .pts-2 { background: rgba(16,185,129,0.15); color: #34d399; }
 .pts-3 { background: rgba(16,185,129,0.3); color: #10b981; }
 .pts-3::after { content: ' 🎯'; }
+.pts-4 { background: rgba(16,185,129,0.4); color: #059669; }
+.pts-5 { background: rgba(16,185,129,0.5); color: #047857; }
+.pts-6 { background: rgba(16,185,129,0.6); color: #065f46; font-weight: 800; }
+.pts-6::after { content: ' 🏆'; }
+
 .match-card.has-result .score-cell.correct { background: rgba(16,185,129,0.1); border-radius: 6px; }
 .match-card.has-result .score-cell.perfect { background: rgba(16,185,129,0.2); border-radius: 6px; box-shadow: 0 0 6px rgba(16,185,129,0.3); }
 
@@ -173,6 +178,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   <div class="nav-tab" data-tab="r16" onclick="showTab('r16')">⚡ R16 (8)</div>
   <div class="nav-tab" data-tab="qf" onclick="showTab('qf')">🔥 QF (4)</div>
   <div class="nav-tab" data-tab="sf" onclick="showTab('sf')">💎 SF (2)</div>
+  <div class="nav-tab" data-tab="third" onclick="showTab('third')">🥉 3rd Place</div>
   <div class="nav-tab" data-tab="final" onclick="showTab('final')">🏆 Final</div>
 </div>
 
@@ -190,13 +196,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="stat"><i class="fa-solid fa-plus-minus"></i> <strong>1pt</strong> Goal diff</div>
     <div class="stat"><i class="fa-solid fa-bullseye"></i> <strong>1pt</strong> Exact</div>
     <div class="stat"><i class="fa-solid fa-lock"></i> Locks 1hr before kickoff</div>
-    <div class="stat" style="margin-left:auto"><i class="fa-solid fa-futbol"></i> <span id="matches-info">0/31 played</span></div>
+    <div class="stat"><i class="fa-solid fa-star"></i> SF/3rd/Final = <strong>2x pts</strong></div>
+    <div class="stat" style="margin-left:auto"><i class="fa-solid fa-futbol"></i> <span id="matches-info">0/32 played</span></div>
   </div>
 
   <div class="panel active" id="panel-r32"></div>
   <div class="panel" id="panel-r16"></div>
   <div class="panel" id="panel-qf"></div>
   <div class="panel" id="panel-sf"></div>
+  <div class="panel" id="panel-third"></div>
   <div class="panel" id="panel-final"></div>
 
   <div class="actions">
@@ -220,7 +228,7 @@ var FLAGS = {
   "Mexico":"🇲🇽","Ecuador":"🇪🇨","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","DR Congo":"🇨🇩","Belgium":"🇧🇪","Senegal":"🇸🇳",
   "USA":"🇺🇸","Bosnia & Herz.":"🇧🇦","Spain":"🇪🇸","Portugal":"🇵🇹","Croatia":"🇭🇷",
   "Switzerland":"🇨🇭","Australia":"🇦🇺","Egypt":"🇪🇬","Argentina":"🇦🇷","Cape Verde":"🇨🇻",
-  "Colombia":"🇨🇴","Ghana":"🇬🇭","Austria":"🇦🇹","Algeria":"🇩🇿","TBD":"❓"
+  "Colombia":"🇨🇴","Ghana":"🇬🇭","Paraguay":"🇵🇾","Austria":"🇦🇹","Algeria":"🇩🇿","TBD":"❓"
 };
 var PLAYERS = ["Daddy","Antoine","Gena","Mommy","Sophia"];
 var AVATARS = ["👨🏻‍🦱","👦🏻","👧🏻","👩🏻‍🦱","👩🏻"];
@@ -248,8 +256,8 @@ var allMatches = {
     {id:"r32_16",home:"Colombia",away:"Ghana",date:"Jul 4",kickoff:"2026-07-04T01:30:00Z"}
   ],
   r16: [
-    {id:"r16_01",home:"TBD",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z"},
-    {id:"r16_02",home:"TBD",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z"},
+    {id:"r16_01",home:"Canada",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z"},
+    {id:"r16_02",home:"Paraguay",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z"},
     {id:"r16_03",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T20:00:00Z"},
     {id:"r16_04",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T23:00:00Z"},
     {id:"r16_05",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T20:00:00Z"},
@@ -267,11 +275,14 @@ var allMatches = {
     {id:"sf_01",home:"TBD",away:"TBD",date:"Jul 14",kickoff:"2026-07-14T00:00:00Z"},
     {id:"sf_02",home:"TBD",away:"TBD",date:"Jul 15",kickoff:"2026-07-15T00:00:00Z"}
   ],
+  third: [
+    {id:"third_01",home:"TBD",away:"TBD",date:"Jul 18",kickoff:"2026-07-18T20:00:00Z"}
+  ],
   final: [
     {id:"final_01",home:"TBD",away:"TBD",date:"Jul 19",kickoff:"2026-07-19T20:00:00Z"}
   ]
 };
-var roundKeys = ['r32','r16','qf','sf','final'];
+var roundKeys = ['r32','r16','qf','sf','third','final'];
 var sheetData = {}; // stores {match_id: {daddy_h: x, daddy_a: y, ...}}
 
 // Is a match locked? (1 hour before kickoff)
@@ -493,10 +504,13 @@ function calculate() {
         var predW = getWinner(m.id, p);
         var actW = getActualWinner(m.id);
         var pts = calcPoints(ph, pa, ah, aa, predW, actW);
+        // Double points for SF, 3rd place, and Final
+        var multiplier = (roundKeys[r] === 'sf' || roundKeys[r] === 'third' || roundKeys[r] === 'final') ? 2 : 1;
+        if (pts !== null) pts = pts * multiplier;
         var badge = document.getElementById(m.id + '_pts' + p);
         if (pts !== null) {
           badge.textContent = pts;
-          badge.className = 'pts-badge pts-' + pts;
+          badge.className = 'pts-badge pts-' + Math.min(pts, 6);
           totals[p] += pts;
           if (pts >= 1) wins[p]++;
           if (pts >= 2) diffs[p]++;
