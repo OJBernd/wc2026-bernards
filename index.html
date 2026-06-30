@@ -490,7 +490,9 @@ function calculate() {
         // Default to 0-0 if locked and no prediction was made
         if (locked && ph === null) ph = 0;
         if (locked && pa === null) pa = 0;
-        var pts = calcPoints(ph, pa, ah, aa);
+        var predW = getWinner(m.id, p);
+        var actW = getActualWinner(m.id);
+        var pts = calcPoints(ph, pa, ah, aa, predW, actW);
         var badge = document.getElementById(m.id + '_pts' + p);
         if (pts !== null) {
           badge.textContent = pts;
