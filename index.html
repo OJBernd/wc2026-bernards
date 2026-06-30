@@ -109,6 +109,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .hidden-input { color: transparent !important; background: var(--surface-hover) !important; width: 32px; }
 .hidden-input::-webkit-inner-spin-button { display: none; }
 .other-hidden .dash { opacity: 0.3; }
+.winner-pick { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 9px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--text-sec); margin-left: 2px; }
+.winner-pick.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.winner-pick-wrap { display: none; margin-top: 2px; text-align: center; }
+.winner-pick-wrap.show { display: block; }
 .pred-done { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); margin-left: 4px; vertical-align: middle; }
 .pred-pending { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); opacity: 0.3; margin-left: 4px; vertical-align: middle; }
 /* Other players' scores shown but not editable */
@@ -301,7 +305,7 @@ function renderRound(key) {
     for (var p = 0; p < 5; p++) {
       if (p === currentPlayer) {
         // Current player: always sees own predictions, editable until lock
-        html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"></div>';
+        html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a"' + (locked ? ' disabled' : '') + ' onchange="onPredChange(\'' + m.id + '\')"><div class="winner-pick-wrap" id="' + m.id + '_p' + p + 'ww"><select id="' + m.id + '_p' + p + 'w" style="font-size:9px;padding:1px;border-radius:3px;background:var(--bg);color:var(--text);border:1px solid var(--border);" onchange="onPredChange(\'' + m.id + '\')"><option value=\'h\'>⬆ Home wins</option><option value=\'a\'>⬇ Away wins</option></select></div></div>';
       } else if (locked) {
         // Other players after lock: visible, disabled
         html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'h" disabled><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_p' + p + 'a" disabled></div>';
@@ -311,7 +315,7 @@ function renderRound(key) {
       }
     }
     var canEditActual = (currentPlayer === 0);
-    html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_ah" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_aa" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"></div>';
+    html += '<div class="score-cell"><input type="number" min="0" max="20" id="' + m.id + '_ah" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="checkTie(\'' + m.id + '\');calculate()"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_aa" style="border-color:var(--success)"' + (canEditActual ? '' : ' disabled') + ' onchange="checkTie(\'' + m.id + '\');calculate()"><div class="winner-pick-wrap" id="' + m.id + '_aww"><span style="font-size:9px;color:var(--text-muted);">PKs:</span> <input type="number" min="0" max="20" id="' + m.id + '_pkh" style="width:26px;padding:2px;font-size:10px;border:1px solid var(--accent);border-radius:3px;background:var(--bg);color:var(--text);text-align:center;"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"><span class="dash">-</span><input type="number" min="0" max="20" id="' + m.id + '_pka" style="width:26px;padding:2px;font-size:10px;border:1px solid var(--accent);border-radius:3px;background:var(--bg);color:var(--text);text-align:center;"' + (canEditActual ? '' : ' disabled') + ' onchange="calculate()"></div></div>';
 
     for (var p = 0; p < 5; p++) {
       html += '<div style="text-align:center"><span class="pts-badge" id="' + m.id + '_pts' + p + '">-</span></div>';
@@ -366,11 +370,24 @@ function showTab(tab) {
 // ========== SCORING ==========
 function getVal(id) { var el = document.getElementById(id); if (!el || el.value === '') return null; return parseInt(el.value, 10); }
 function sign(n) { return n > 0 ? 1 : (n < 0 ? -1 : 0); }
-function calcPoints(ph, pa, ah, aa) {
+function calcPoints(ph, pa, ah, aa, predWinner, actualWinner) {
   if (ph === null || pa === null || ah === null || aa === null) return null;
   var pts = 0;
-  if (sign(ph - pa) === sign(ah - aa)) pts++;
+  // 1. Correct advancing team (1 pt)
+  // Determine who advances in prediction
+  var predAdvances = '';
+  if (ph > pa) predAdvances = 'h';
+  else if (pa > ph) predAdvances = 'a';
+  else predAdvances = predWinner || 'h'; // if draw predicted, use their pick (default home)
+  // Determine who actually advanced
+  var actAdvances = '';
+  if (ah > aa) actAdvances = 'h';
+  else if (aa > ah) actAdvances = 'a';
+  else actAdvances = actualWinner || 'h'; // if draw, use actual_winner field
+  if (predAdvances === actAdvances) pts++;
+  // 2. Correct goal differential (1 pt)
   if ((ph - pa) === (ah - aa)) pts++;
+  // 3. Exact score (1 pt)
   if (ph === ah && pa === aa) pts++;
   return pts;
 }
@@ -403,6 +420,45 @@ function updateIndicators() {
         }
       }
     }
+  }
+}
+
+// Get a player's predicted advancing team for a match
+function getWinner(matchId, playerIdx) {
+  var el = document.getElementById(matchId + '_p' + playerIdx + 'w');
+  if (el) return el.value; // 'h' or 'a'
+  return 'h'; // default home if no selector
+}
+
+// Get the actual advancing team for a match
+function getActualWinner(matchId) {
+  var pkh = getVal(matchId + '_pkh');
+  var pka = getVal(matchId + '_pka');
+  if (pkh !== null && pka !== null) {
+    if (pkh > pka) return 'h';
+    if (pka > pkh) return 'a';
+  }
+  return 'h'; // default home if no PK score entered
+}
+
+
+function checkTie(matchId) {
+  var ah = getVal(matchId + '_ah');
+  var aa = getVal(matchId + '_aa');
+  var wrap = document.getElementById(matchId + '_aww');
+  if (wrap) {
+    if (ah !== null && aa !== null && ah === aa) wrap.classList.add('show');
+    else wrap.classList.remove('show');
+  }
+}
+
+function checkPredTie(matchId, playerIdx) {
+  var ph = getVal(matchId + '_p' + playerIdx + 'h');
+  var pa = getVal(matchId + '_p' + playerIdx + 'a');
+  var wrap = document.getElementById(matchId + '_p' + playerIdx + 'ww');
+  if (wrap) {
+    if (ph !== null && pa !== null && ph === pa) wrap.classList.add('show');
+    else wrap.classList.remove('show');
   }
 }
 
@@ -476,6 +532,7 @@ function calculate() {
 
 // ========== GOOGLE SHEETS SYNC ==========
 function onPredChange(matchId) {
+  checkPredTie(matchId, currentPlayer);
   calculate();
   // Auto-save to Google Sheet
   var h = getVal(matchId + '_p' + currentPlayer + 'h');
@@ -549,6 +606,16 @@ function applySheetData(rows) {
     var aaEl = document.getElementById(id + '_aa');
     if (ahEl && row.actual_h !== '' && row.actual_h !== undefined) ahEl.value = row.actual_h;
     if (aaEl && row.actual_a !== '' && row.actual_a !== undefined) aaEl.value = row.actual_a;
+    // PK scores
+    var pkhEl = document.getElementById(id + '_pkh');
+    var pkaEl = document.getElementById(id + '_pka');
+    if (pkhEl && row.pk_h !== '' && row.pk_h !== undefined) pkhEl.value = row.pk_h;
+    if (pkaEl && row.pk_a !== '' && row.pk_a !== undefined) pkaEl.value = row.pk_a;
+    // Show PK row if actual is a tie
+    if (row.actual_h !== '' && row.actual_a !== '' && row.actual_h == row.actual_a) {
+      var pkWrap = document.getElementById(id + '_aww');
+      if (pkWrap) pkWrap.classList.add('show');
+    }
   }
 }
 
