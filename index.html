@@ -238,48 +238,48 @@ var currentPlayer = 0;
 // Match data with kickoff times (UTC)
 var allMatches = {
   r32: [
-    {id:"r32_01",home:"South Africa",away:"Canada",date:"Jun 28",kickoff:"2026-06-28T19:00:00Z"},
-    {id:"r32_02",home:"Brazil",away:"Japan",date:"Jun 29",kickoff:"2026-06-29T17:00:00Z"},
-    {id:"r32_03",home:"Germany",away:"Paraguay",date:"Jun 29",kickoff:"2026-06-29T20:30:00Z"},
-    {id:"r32_04",home:"Netherlands",away:"Morocco",date:"Jun 30",kickoff:"2026-06-30T01:00:00Z"},
-    {id:"r32_05",home:"Ivory Coast",away:"Norway",date:"Jun 30",kickoff:"2026-06-30T17:00:00Z"},
-    {id:"r32_06",home:"France",away:"Sweden",date:"Jun 30",kickoff:"2026-06-30T21:00:00Z"},
-    {id:"r32_07",home:"Mexico",away:"Ecuador",date:"Jul 1",kickoff:"2026-07-01T01:00:00Z"},
-    {id:"r32_08",home:"England",away:"DR Congo",date:"Jul 1",kickoff:"2026-07-01T16:00:00Z"},
-    {id:"r32_09",home:"Belgium",away:"Senegal",date:"Jul 1",kickoff:"2026-07-01T20:00:00Z"},
-    {id:"r32_10",home:"USA",away:"Bosnia & Herz.",date:"Jul 2",kickoff:"2026-07-02T00:00:00Z"},
-    {id:"r32_11",home:"Spain",away:"Austria",date:"Jul 2",kickoff:"2026-07-02T19:00:00Z"},
-    {id:"r32_12",home:"Portugal",away:"Croatia",date:"Jul 2",kickoff:"2026-07-02T23:00:00Z"},
-    {id:"r32_13",home:"Switzerland",away:"Algeria",date:"Jul 3",kickoff:"2026-07-03T03:00:00Z"},
-    {id:"r32_14",home:"Australia",away:"Egypt",date:"Jul 3",kickoff:"2026-07-03T18:00:00Z"},
-    {id:"r32_15",home:"Argentina",away:"Cape Verde",date:"Jul 3",kickoff:"2026-07-03T22:00:00Z"},
-    {id:"r32_16",home:"Colombia",away:"Ghana",date:"Jul 4",kickoff:"2026-07-04T01:30:00Z"}
+    {id:"r32_01",home:"South Africa",away:"Canada",date:"Jun 28",kickoff:"2026-06-28T19:00:00Z",city:"Los Angeles"},
+    {id:"r32_02",home:"Brazil",away:"Japan",date:"Jun 29",kickoff:"2026-06-29T17:00:00Z",city:"Houston"},
+    {id:"r32_03",home:"Germany",away:"Paraguay",date:"Jun 29",kickoff:"2026-06-29T20:30:00Z",city:"Boston"},
+    {id:"r32_04",home:"Netherlands",away:"Morocco",date:"Jun 30",kickoff:"2026-06-30T01:00:00Z",city:"Monterrey"},
+    {id:"r32_05",home:"Ivory Coast",away:"Norway",date:"Jun 30",kickoff:"2026-06-30T17:00:00Z",city:"Dallas"},
+    {id:"r32_06",home:"France",away:"Sweden",date:"Jun 30",kickoff:"2026-06-30T21:00:00Z",city:"New York"},
+    {id:"r32_07",home:"Mexico",away:"Ecuador",date:"Jul 1",kickoff:"2026-07-01T01:00:00Z",city:"Mexico City"},
+    {id:"r32_08",home:"England",away:"DR Congo",date:"Jul 1",kickoff:"2026-07-01T16:00:00Z",city:"Atlanta"},
+    {id:"r32_09",home:"Belgium",away:"Senegal",date:"Jul 1",kickoff:"2026-07-01T20:00:00Z",city:"Seattle"},
+    {id:"r32_10",home:"USA",away:"Bosnia & Herz.",date:"Jul 2",kickoff:"2026-07-02T00:00:00Z",city:"San Francisco"},
+    {id:"r32_11",home:"Spain",away:"Austria",date:"Jul 2",kickoff:"2026-07-02T19:00:00Z",city:"Los Angeles"},
+    {id:"r32_12",home:"Portugal",away:"Croatia",date:"Jul 2",kickoff:"2026-07-02T23:00:00Z",city:"Toronto"},
+    {id:"r32_13",home:"Switzerland",away:"Algeria",date:"Jul 3",kickoff:"2026-07-03T03:00:00Z",city:"Vancouver"},
+    {id:"r32_14",home:"Australia",away:"Egypt",date:"Jul 3",kickoff:"2026-07-03T18:00:00Z",city:"Dallas"},
+    {id:"r32_15",home:"Argentina",away:"Cape Verde",date:"Jul 3",kickoff:"2026-07-03T22:00:00Z",city:"Miami"},
+    {id:"r32_16",home:"Colombia",away:"Ghana",date:"Jul 4",kickoff:"2026-07-04T01:30:00Z",city:"Kansas City"}
   ],
   r16: [
-    {id:"r16_01",home:"Canada",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z"},
-    {id:"r16_02",home:"Paraguay",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z"},
-    {id:"r16_03",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T20:00:00Z"},
-    {id:"r16_04",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T23:00:00Z"},
-    {id:"r16_05",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T20:00:00Z"},
-    {id:"r16_06",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T23:00:00Z"},
-    {id:"r16_07",home:"TBD",away:"TBD",date:"Jul 7",kickoff:"2026-07-07T20:00:00Z"},
-    {id:"r16_08",home:"TBD",away:"TBD",date:"Jul 7",kickoff:"2026-07-07T23:00:00Z"}
+    {id:"r16_01",home:"Canada",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z",city:"Houston"},
+    {id:"r16_02",home:"Paraguay",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z",city:"Philadelphia"},
+    {id:"r16_03",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T20:00:00Z",city:"New York"},
+    {id:"r16_04",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T23:00:00Z",city:"Mexico City"},
+    {id:"r16_05",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T20:00:00Z",city:"Dallas"},
+    {id:"r16_06",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T23:00:00Z",city:"Seattle"},
+    {id:"r16_07",home:"TBD",away:"TBD",date:"Jul 7",kickoff:"2026-07-07T20:00:00Z",city:"Atlanta"},
+    {id:"r16_08",home:"TBD",away:"TBD",date:"Jul 7",kickoff:"2026-07-07T23:00:00Z",city:"Vancouver"}
   ],
   qf: [
-    {id:"qf_01",home:"TBD",away:"TBD",date:"Jul 9",kickoff:"2026-07-09T20:00:00Z"},
-    {id:"qf_02",home:"TBD",away:"TBD",date:"Jul 9",kickoff:"2026-07-09T23:00:00Z"},
-    {id:"qf_03",home:"TBD",away:"TBD",date:"Jul 10",kickoff:"2026-07-10T20:00:00Z"},
-    {id:"qf_04",home:"TBD",away:"TBD",date:"Jul 11",kickoff:"2026-07-11T00:00:00Z"}
+    {id:"qf_01",home:"TBD",away:"TBD",date:"Jul 9",kickoff:"2026-07-09T20:00:00Z",city:"Los Angeles"},
+    {id:"qf_02",home:"TBD",away:"TBD",date:"Jul 9",kickoff:"2026-07-09T23:00:00Z",city:"Houston"},
+    {id:"qf_03",home:"TBD",away:"TBD",date:"Jul 10",kickoff:"2026-07-10T20:00:00Z",city:"Dallas"},
+    {id:"qf_04",home:"TBD",away:"TBD",date:"Jul 11",kickoff:"2026-07-11T00:00:00Z",city:"Kansas City"}
   ],
   sf: [
-    {id:"sf_01",home:"TBD",away:"TBD",date:"Jul 14",kickoff:"2026-07-14T00:00:00Z"},
-    {id:"sf_02",home:"TBD",away:"TBD",date:"Jul 15",kickoff:"2026-07-15T00:00:00Z"}
+    {id:"sf_01",home:"TBD",away:"TBD",date:"Jul 14",kickoff:"2026-07-14T00:00:00Z",city:"New York"},
+    {id:"sf_02",home:"TBD",away:"TBD",date:"Jul 15",kickoff:"2026-07-15T00:00:00Z",city:"Dallas"}
   ],
   third: [
-    {id:"third_01",home:"TBD",away:"TBD",date:"Jul 18",kickoff:"2026-07-18T20:00:00Z"}
+    {id:"third_01",home:"TBD",away:"TBD",date:"Jul 18",kickoff:"2026-07-18T20:00:00Z",city:"Miami"}
   ],
   final: [
-    {id:"final_01",home:"TBD",away:"TBD",date:"Jul 19",kickoff:"2026-07-19T20:00:00Z"}
+    {id:"final_01",home:"TBD",away:"TBD",date:"Jul 19",kickoff:"2026-07-19T20:00:00Z",city:"New York"}
   ]
 };
 var roundKeys = ['r32','r16','qf','sf','third','final'];
@@ -303,7 +303,10 @@ function renderRound(key) {
     html += '<div class="match-card' + (locked ? ' locked' : '') + '" id="row-' + m.id + '">';
     html += '<div class="match-header">';
     html += '<div class="matchup">' + flag(m.home) + ' ' + m.home + '<span class="vs">vs</span>' + flag(m.away) + ' ' + m.away + '</div>';
-    html += '<div class="meta"><span id="' + m.id + '_winner_flag" style="font-size:14px;margin-right:4px;"></span>' + m.date;
+    var timeStr = '';
+    if (m.kickoff) { var d = new Date(m.kickoff); timeStr = d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }
+    var cityStr = m.city ? ' \u00b7 ' + m.city : '';
+    html += '<div class="meta"><span id="' + m.id + '_winner_flag" style="font-size:14px;margin-right:4px;"></span>' + m.date + ' \u00b7 ' + timeStr + cityStr;
     if (locked) html += ' <span class="lock-badge"><i class="fa-solid fa-lock"></i> LOCKED</span>';
     html += '</div></div>';
 
@@ -470,6 +473,57 @@ function checkPredTie(matchId, playerIdx) {
   if (wrap) {
     if (ph !== null && pa !== null && ph === pa) wrap.classList.add('show');
     else wrap.classList.remove('show');
+  }
+}
+
+
+function updateTeamNames() {
+  // After sync, update team names in match headers from sheetData
+  var roundsToUpdate = ['r16','qf','sf','third','final'];
+  for (var r = 0; r < roundsToUpdate.length; r++) {
+    var rk = roundsToUpdate[r];
+    var ms = allMatches[rk];
+    for (var i = 0; i < ms.length; i++) {
+      var m = ms[i];
+      var row = sheetData[m.id];
+      if (row && row.home) {
+        m.home = row.home;
+        m.away = row.away || 'TBD';
+      }
+    }
+  }
+  // Re-render the panels for these rounds
+  for (var r = 0; r < roundsToUpdate.length; r++) {
+    var panel = document.getElementById('panel-' + roundsToUpdate[r]);
+    if (panel) panel.innerHTML = renderRound(roundsToUpdate[r]);
+  }
+  // Re-apply values from sheet to the newly rendered inputs
+  for (var r = 0; r < roundsToUpdate.length; r++) {
+    var ms = allMatches[roundsToUpdate[r]];
+    for (var i = 0; i < ms.length; i++) {
+      var mid = ms[i].id;
+      var row = sheetData[mid];
+      if (!row) continue;
+      var playerKeys = ['daddy','antoine','gena','mommy','sophia'];
+      for (var p = 0; p < 5; p++) {
+        var hEl = document.getElementById(mid + '_p' + p + 'h');
+        var aEl = document.getElementById(mid + '_p' + p + 'a');
+        if (hEl && row[playerKeys[p] + '_h'] !== '' && row[playerKeys[p] + '_h'] !== undefined) hEl.value = row[playerKeys[p] + '_h'];
+        if (aEl && row[playerKeys[p] + '_a'] !== '' && row[playerKeys[p] + '_a'] !== undefined) aEl.value = row[playerKeys[p] + '_a'];
+      }
+      var ahEl = document.getElementById(mid + '_ah');
+      var aaEl = document.getElementById(mid + '_aa');
+      if (ahEl && row.actual_h !== '' && row.actual_h !== undefined) ahEl.value = row.actual_h;
+      if (aaEl && row.actual_a !== '' && row.actual_a !== undefined) aaEl.value = row.actual_a;
+      var pkhEl = document.getElementById(mid + '_pkh');
+      var pkaEl = document.getElementById(mid + '_pka');
+      if (pkhEl && row.pk_h !== '' && row.pk_h !== undefined) pkhEl.value = row.pk_h;
+      if (pkaEl && row.pk_a !== '' && row.pk_a !== undefined) pkaEl.value = row.pk_a;
+      if (row.actual_h !== '' && row.actual_a !== '' && row.actual_h == row.actual_a) {
+        var pkWrap = document.getElementById(mid + '_aww');
+        if (pkWrap) pkWrap.classList.add('show');
+      }
+    }
   }
 }
 
