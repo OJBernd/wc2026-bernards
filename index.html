@@ -256,10 +256,10 @@ var allMatches = {
     {id:"r32_16",home:"Colombia",away:"Ghana",date:"Jul 4",kickoff:"2026-07-04T01:30:00Z",city:"Kansas City"}
   ],
   r16: [
-    {id:"r16_01",home:"Canada",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z",city:"Houston"},
-    {id:"r16_02",home:"Paraguay",away:"TBD",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z",city:"Philadelphia"},
-    {id:"r16_03",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T20:00:00Z",city:"New York"},
-    {id:"r16_04",home:"TBD",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T23:00:00Z",city:"Mexico City"},
+    {id:"r16_01",home:"Morocco",away:"Canada",date:"Jul 4",kickoff:"2026-07-04T20:00:00Z",city:"Houston"},
+    {id:"r16_02",home:"Paraguay",away:"France",date:"Jul 4",kickoff:"2026-07-04T23:00:00Z",city:"Philadelphia"},
+    {id:"r16_03",home:"Brazil",away:"Norway",date:"Jul 5",kickoff:"2026-07-05T20:00:00Z",city:"New York"},
+    {id:"r16_04",home:"Mexico",away:"TBD",date:"Jul 5",kickoff:"2026-07-05T23:00:00Z",city:"Mexico City"},
     {id:"r16_05",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T20:00:00Z",city:"Dallas"},
     {id:"r16_06",home:"TBD",away:"TBD",date:"Jul 6",kickoff:"2026-07-06T23:00:00Z",city:"Seattle"},
     {id:"r16_07",home:"TBD",away:"TBD",date:"Jul 7",kickoff:"2026-07-07T20:00:00Z",city:"Atlanta"},
@@ -304,9 +304,10 @@ function renderRound(key) {
     html += '<div class="match-header">';
     html += '<div class="matchup">' + flag(m.home) + ' ' + m.home + '<span class="vs">vs</span>' + flag(m.away) + ' ' + m.away + '</div>';
     var timeStr = '';
-    if (m.kickoff) { var d = new Date(m.kickoff); timeStr = d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }
+    var localDate = m.date;
+    if (m.kickoff) { var d = new Date(m.kickoff); timeStr = d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); localDate = d.toLocaleDateString([], {month:'short',day:'numeric'}); }
     var cityStr = m.city ? ' \u00b7 ' + m.city : '';
-    html += '<div class="meta"><span id="' + m.id + '_winner_flag" style="font-size:14px;margin-right:4px;"></span>' + m.date + ' \u00b7 ' + timeStr + cityStr;
+    html += '<div class="meta"><span id="' + m.id + '_winner_flag" style="font-size:14px;margin-right:4px;"></span>' + localDate + ' \u00b7 ' + timeStr + cityStr;
     if (locked) html += ' <span class="lock-badge"><i class="fa-solid fa-lock"></i> LOCKED</span>';
     html += '</div></div>';
 
